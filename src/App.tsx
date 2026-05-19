@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   Home, 
   Calendar, 
@@ -29,6 +29,7 @@ type Role = 'PARENT' | 'DOCTOR' | 'ADMIN';
 export default function App() {
   const [role, setRole] = useState<Role | null>(null);
   const [activeTab, setActiveTab] = useState('home');
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // Unified Shell to prevent "jumping" UI
   const SmartphoneShell = ({ children }: { children: React.ReactNode }) => (
@@ -44,7 +45,17 @@ export default function App() {
   if (!role) {
     return (
       <SmartphoneShell>
-        <LoginView onLogin={(selectedRole) => setRole(selectedRole)} />
+        {isRegistering ? (
+          <RegisterView 
+            onRegister={() => { setIsRegistering(false); setRole('PARENT'); }} 
+            onBack={() => setIsRegistering(false)} 
+          />
+        ) : (
+          <LoginView 
+            onLogin={(selectedRole) => setRole(selectedRole)} 
+            onGoToRegister={() => setIsRegistering(true)}
+          />
+        )}
       </SmartphoneShell>
     );
   }
@@ -79,8 +90,8 @@ export default function App() {
               </div>
               <div>
                 <p className="text-sky-100 text-[10px] font-bold uppercase tracking-widest opacity-80">CeriaCare App</p>
-                <h1 className="font-bold text-lg leading-tight tracking-tight">
-                  {role === 'PARENT' ? 'Bunda Sarah 👋' : role === 'DOCTOR' ? 'dr. Budi, Sp.A' : 'System Admin'}
+                <h1 className="font-bold text-xl leading-tight tracking-tight font-calligraphy">
+                  {role === 'PARENT' ? 'Bunda Sarah' : role === 'DOCTOR' ? 'dr. Budi, Sp.A' : 'Admin Aloy'}
                 </h1>
               </div>
             </div>
@@ -95,7 +106,9 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               className="mt-6 glass-card p-4 flex items-center gap-4"
             >
-              <div className="w-12 h-12 bg-sun rounded-2xl flex items-center justify-center text-2xl shadow-inner">🧸</div>
+              <div className="w-12 h-12 bg-sun rounded-2xl flex items-center justify-center shadow-inner">
+                <Clock className="text-brand-blue" size={24} />
+              </div>
               <div>
                 <p className="text-[10px] text-sky-50 font-black uppercase tracking-widest opacity-90">Jadwal Terdekat</p>
                 <p className="text-sm font-bold">Resep Siap: Arka (5th)</p>
@@ -108,9 +121,9 @@ export default function App() {
         {/* Dynamic Main Body */}
         <main className="flex-1 overflow-y-auto bg-[#F8FAFC] pb-24 scrollbar-hide">
           <AnimatePresence mode="wait">
-            {role === 'PARENT' && <ParentView activeTab={activeTab} setActiveTab={setActiveTab} key="parent" />}
-            {role === 'DOCTOR' && <DoctorView activeTab={activeTab} setActiveTab={setActiveTab} key="doctor" />}
-            {role === 'ADMIN' && <AdminView activeTab={activeTab} setActiveTab={setActiveTab} key="admin" />}
+            {role === 'PARENT' && <ParentView key="parent" activeTab={activeTab} setActiveTab={setActiveTab} />}
+            {role === 'DOCTOR' && <DoctorView key="doctor" activeTab={activeTab} setActiveTab={setActiveTab} />}
+            {role === 'ADMIN' && <AdminView key="admin" activeTab={activeTab} setActiveTab={setActiveTab} />}
           </AnimatePresence>
         </main>
 
@@ -143,6 +156,7 @@ function NavItems({ role, activeTab, setActiveTab }: { role: Role, activeTab: st
     <>
       <NavButton active={activeTab === 'home'} icon={Home} label="Home" onClick={() => setActiveTab('home')} />
       <NavButton active={activeTab === 'booking'} icon={Calendar} label="Booking" onClick={() => setActiveTab('booking')} />
+      <NavButton active={activeTab === 'history'} icon={History} label="Riwayat" onClick={() => setActiveTab('history')} />
       <NavButton active={activeTab === 'payment'} icon={CreditCard} label="Bayar" onClick={() => setActiveTab('payment')} />
       <NavButton active={activeTab === 'profile'} icon={User} label="Profil" onClick={() => setActiveTab('profile')} />
     </>
@@ -178,7 +192,7 @@ function LoginView({ onLogin, onGoToRegister }: { onLogin: (role: Role) => void,
       </motion.div>
 
       <div className="space-y-3 z-10">
-        <h1 className="text-5xl font-black text-brand-blue tracking-tighter">CeriaCare</h1>
+        <h1 className="text-5xl font-black text-brand-blue tracking-tighter font-calligraphy">CeriaCare</h1>
         <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Pediatric Care Redefined</p>
       </div>
 
@@ -247,13 +261,13 @@ function RegisterView({ onRegister, onBack }: { onRegister: () => void, onBack: 
   );
 }
 
-function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) {
+function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void, key?: string }) {
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
 
   if (activeTab === 'payment' || selectedPayment) {
     return (
       <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="p-6 space-y-6">
-        <h2 className="text-2xl font-bold text-brand-blue">Pembayaran 💳</h2>
+        <h2 className="text-2xl font-bold text-brand-blue">Pembayaran</h2>
         <div className="space-y-4">
           {[{ id: 'INV-009', item: 'Pemeriksaan Umum - Arka', price: 'Rp 250.000', status: 'PENDING' }, { id: 'INV-008', item: 'Vaksin DPT - Ziva', price: 'Rp 450.000', status: 'PAID' }].map((inv, i) => (
             <div key={i} className="card-bubble border-slate-100">
@@ -314,13 +328,13 @@ function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
           <h3 className="text-brand-blue font-black text-xs uppercase tracking-[0.2em] mb-5">Layanan Utama</h3>
           <div className="grid grid-cols-4 gap-4">
             {[
-              { icon: '📅', label: 'Booking', t: 'booking', bg: 'bg-primary/10 border-primary/20' },
-              { icon: '👨‍⚕️', label: 'Dokter', t: 'home', bg: 'bg-secondary/10 border-secondary/20' },
-              { icon: '🏥', label: 'Riwayat', t: 'history', bg: 'bg-accent/10 border-accent/20' },
-              { icon: '💳', label: 'Tagihan', t: 'payment', bg: 'bg-sun/10 border-sun/20' }
+              { icon: <Calendar size={22} />, label: 'Booking', t: 'booking', bg: 'bg-primary/10 border-primary/20', color: 'text-primary' },
+              { icon: <User size={22} />, label: 'Dokter', t: 'home', bg: 'bg-secondary/10 border-secondary/20', color: 'text-secondary' },
+              { icon: <History size={22} />, label: 'Riwayat', t: 'history', bg: 'bg-accent/10 border-accent/20', color: 'text-accent' },
+              { icon: <CreditCard size={22} />, label: 'Tagihan', t: 'payment', bg: 'bg-sun/10 border-sun/20', color: 'text-sun' }
             ].map((item, i) => (
               <button key={i} onClick={() => setActiveTab(item.t)} className="flex flex-col items-center gap-2 group">
-                <div className={`w-14 h-14 ${item.bg} border rounded-2xl flex items-center justify-center text-2xl shadow-sm group-hover:scale-105 transition-all`}>
+                <div className={`w-14 h-14 ${item.bg} ${item.color} border rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-all`}>
                   {item.icon}
                 </div>
                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">{item.label}</span>
@@ -337,7 +351,9 @@ function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
             <p className="text-[11px] text-[#92400E]/70 mt-1 font-medium leading-relaxed">Konsultasi pertolongan pertama 24/7 bersama admin medis.</p>
             <button className="mt-4 bg-secondary text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-secondary/30">Mulai</button>
           </div>
-          <div className="absolute right-4 bottom-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-inner text-3xl">💬</div>
+          <div className="absolute right-4 bottom-4 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-inner text-primary">
+            <Bell size={32} />
+          </div>
         </div>
 
         {/* Queue Progress Monitor */}
@@ -365,6 +381,61 @@ function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
             </div>
           </div>
         </section>
+      </motion.div>
+    );
+  }
+
+  if (activeTab === 'profile') {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-8 pb-32">
+        <div className="flex flex-col items-center gap-4 pt-4">
+           <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden bg-secondary/20 flex items-center justify-center">
+              <User size={48} className="text-secondary" />
+           </div>
+           <div className="text-center">
+              <h2 className="text-3xl font-black text-brand-blue font-calligraphy">Bunda Sarah</h2>
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Premium Member</p>
+           </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="font-black text-[10px] text-slate-300 uppercase tracking-[.3em] ml-2">Anak Anda</h3>
+          <div className="grid grid-cols-2 gap-3">
+             {['Arka Pratama', 'Ziva Putri'].map(name => (
+               <div key={name} className="card-bubble p-4 border-slate-50 flex flex-col items-center text-center gap-2">
+                  <div className="w-10 h-10 bg-sun/20 rounded-full flex items-center justify-center text-primary">
+                    <User size={20} />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 font-calligraphy">{name}</span>
+               </div>
+             ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="font-black text-[10px] text-slate-300 uppercase tracking-[.3em] ml-2">Akun & Keamanan</h3>
+          <div className="space-y-2">
+            {[
+              { label: 'Edit Profil', icon: User },
+              { label: 'Metode Pembayaran', icon: CreditCard },
+              { label: 'Bantuan & Support', icon: Search },
+            ].map((item, i) => (
+              <button key={i} className="card-bubble w-full flex items-center justify-between border-slate-50">
+                 <div className="flex items-center gap-4">
+                    <item.icon size={20} className="text-slate-400" />
+                    <span className="font-bold text-slate-600">{item.label}</span>
+                 </div>
+                 <ChevronRight size={18} className="text-slate-200" />
+              </button>
+            ))}
+            <button onClick={() => window.location.reload()} className="card-bubble w-full flex items-center justify-between border-red-50 bg-red-50/30 group">
+               <div className="flex items-center gap-4">
+                  <LogOut size={20} className="text-red-400" />
+                  <span className="font-bold text-red-600">Keluar Akun</span>
+               </div>
+            </button>
+          </div>
+        </div>
       </motion.div>
     );
   }
@@ -401,7 +472,7 @@ function ParentView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
   return <div className="p-10 text-center font-bold text-slate-300">Coming Soon!</div>;
 }
 
-function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) {
+function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void, key?: string }) {
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
 
   if (selectedPatient) {
@@ -446,7 +517,7 @@ function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
   if (activeTab === 'history') {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-6">
-        <h2 className="text-2xl font-bold text-brand-blue">Selesai Dirawat ✅</h2>
+        <h2 className="text-2xl font-bold text-brand-blue">Selesai Dirawat</h2>
         <div className="space-y-4">
           {[
             { name: 'Kania Rara', age: '4 thn', date: 'Hari Ini, 09:12', spec: 'Poli Umum' },
@@ -475,7 +546,7 @@ function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
               <User size={48} className="text-primary" />
            </div>
            <div className="text-center">
-              <h2 className="text-2xl font-black text-brand-blue">dr. Budi Santoso, Sp.A</h2>
+              <h2 className="text-3xl font-black text-brand-blue font-calligraphy">dr. Budi Santoso, Sp.A</h2>
               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">ID: #DOC-102931</p>
            </div>
         </div>
@@ -497,6 +568,12 @@ function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
                  <ChevronRight size={18} className="text-slate-300" />
               </button>
             ))}
+            <button onClick={() => window.location.reload()} className="card-bubble w-full flex items-center justify-between border-red-50 bg-red-50/30">
+               <div className="flex items-center gap-4">
+                  <LogOut size={20} className="text-red-400" />
+                  <span className="font-bold text-red-600">Log Out Dokter</span>
+               </div>
+            </button>
           </div>
         </div>
       </motion.div>
@@ -533,12 +610,12 @@ function DoctorView({ activeTab, setActiveTab }: { activeTab: string, setActiveT
   );
 }
 
-function AdminView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) {
+function AdminView({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void, key?: string }) {
   if (activeTab === 'home') {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-8 pb-32">
         <div className="space-y-2">
-           <h2 className="text-2xl font-black text-brand-blue tracking-tight">Monitor Aktivitas 🧐</h2>
+           <h2 className="text-2xl font-black text-brand-blue tracking-tight font-calligraphy">Selamat Datang, Admin Aloy</h2>
            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Status Sistem Real-time</p>
         </div>
 
@@ -585,14 +662,14 @@ function AdminView({ activeTab, setActiveTab }: { activeTab: string, setActiveTa
 
   if (activeTab === 'payment') {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-8">
-        <h2 className="text-2xl font-black text-brand-blue tracking-tight">Keuangan Klinik 💰</h2>
-        <div className="card-bubble bg-brand-blue text-white overflow-hidden relative">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-8 pb-32">
+        <h2 className="text-2xl font-black text-brand-blue tracking-tight">Keuangan Klinik</h2>
+        <div className="card-bubble !bg-brand-blue text-white overflow-hidden relative border-none shadow-2xl shadow-primary/20">
            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10" />
            <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Total Pendapatan (Mei)</p>
            <h3 className="text-3xl font-black mt-2 tracking-tighter">Rp 245.890.000</h3>
            <div className="mt-4 flex gap-2">
-              <span className="px-2 py-0.5 bg-white/20 rounded-full text-[9px] font-bold">1,240 Transaksi</span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-[9px] font-bold">1,240 Transaksi</span>
            </div>
         </div>
 
@@ -621,7 +698,7 @@ function AdminView({ activeTab, setActiveTab }: { activeTab: string, setActiveTa
   if (activeTab === 'settings') {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 space-y-8 pb-32">
-        <h2 className="text-2xl font-black text-brand-blue tracking-tight">Data Master & CS 🛠️</h2>
+        <h2 className="text-2xl font-black text-brand-blue tracking-tight">Data Master & CS</h2>
 
         <div className="grid grid-cols-2 gap-4">
            {[
@@ -679,7 +756,15 @@ function AdminView({ activeTab, setActiveTab }: { activeTab: string, setActiveTa
                </div>
              ))}
            </div>
-           <button className="w-full py-4 text-xs font-black text-primary uppercase tracking-widest bg-primary/5 rounded-2xl">Lihat Semua Akun</button>
+           <button className="w-full py-4 text-xs font-black text-primary uppercase tracking-widest bg-primary/5 rounded-2xl mb-4">Lihat Semua Akun</button>
+           
+           <button onClick={() => window.location.reload()} className="card-bubble w-full flex items-center justify-between border-red-50 bg-red-50/20 group">
+              <div className="flex items-center gap-4">
+                 <LogOut size={20} className="text-red-400 group-hover:scale-110 transition-transform" />
+                 <span className="font-bold text-red-600">Log Out Sistem Admin</span>
+              </div>
+              <ChevronRight size={18} className="text-red-200" />
+           </button>
         </section>
       </motion.div>
     );
