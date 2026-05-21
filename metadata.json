@@ -2,5 +2,5 @@
   "name": "CeriaCare - Klinik Anak",
   "description": "A cheerful and child-friendly mobile interface for pediatric clinic management, including parent bookings, doctor portals, and admin management.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

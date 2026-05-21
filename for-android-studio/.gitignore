@@ -1,0 +1,32 @@
+# Gradle files
+.gradle/
+build/
+app/build/
+
+# Android Studio local configuration and user-specific files
+.idea/workspace.xml
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/deploymentTargetSelector.xml
+.idea/deviceStreaming.xml
+.idea/assetWizardSettings.xml
+.idea/modules/
+.idea/nav/
+.idea/ux-debug/
+*.iml
+
+# Local SDK configuration
+local.properties
+
+# Log files
+*.log
+
+# Keystores (sensitive credentials)
+*.jks
+*.keystore
+
+# Built APKs/Bundles
+*.apk
+*.aar
+*.ap_
