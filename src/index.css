@@ -15,8 +15,14 @@
 }
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
-    @apply font-body bg-[#E0F2FE] text-slate-800 antialiased;
+    @apply font-body bg-[#F8FAFC] text-slate-800 antialiased;
+    overflow: hidden;
   }
   h1, h2, h3, h4, .font-heading {
     @apply font-sans;
@@ -46,13 +52,27 @@
   @apply bg-secondary text-white font-bold py-3.5 px-6 rounded-full shadow-lg shadow-secondary/25 hover:bg-secondary/90 active:scale-[0.98] transition-all text-sm uppercase tracking-wider;
 }
 
+/* Full viewport, respects safe areas (iPhone notch / dynamic island / home indicator) */
 .mobile-container {
-  @apply w-full max-w-[420px] h-[850px] bg-[#F8FAFC] relative shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col rounded-[50px] overflow-hidden border-[10px] border-white ring-1 ring-slate-200;
+  width: 100%;
+  height: 100dvh;
+  background-color: #F8FAFC;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.iphone-notch {
-  @apply absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-white rounded-b-3xl z-40 shadow-sm;
+/* Pad header to absorb status bar / dynamic island safe area */
+.header-safe {
+  padding-top: max(24px, env(safe-area-inset-top));
 }
+
+/* Pad bottom nav to absorb home indicator safe area */
+.nav-safe {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
 
 /* Custom Scrollbar Styles for Premium Feel */
 ::-webkit-scrollbar {

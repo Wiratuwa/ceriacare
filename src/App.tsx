@@ -229,14 +229,10 @@ export default function App() {
     }
   ]);
 
-  // Unified Shell to prevent "jumping" UI
+  // Unified Shell
   const SmartphoneShell = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-pattern pointer-events-none" />
-      <div className="mobile-container relative z-10 transition-all duration-500">
-        <div className="iphone-notch" />
-        {children}
-      </div>
+    <div className="mobile-container">
+      {children}
     </div>
   );
 
@@ -304,42 +300,11 @@ export default function App() {
 
   return (
     <SmartphoneShell>
-      {/* Role Switcher overlay for preview ease */}
-      <div className="fixed top-6 right-6 z-50 flex gap-2 bg-white p-2 rounded-full shadow-2xl border border-slate-100 group">
-        <button onClick={() => setRole(null)} className="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-colors"><LogOut size={16} /></button>
-        <div className="h-4 w-[1px] bg-slate-200 my-auto" />
-        <button
-          onClick={() => handleParentLogin('parent-1')}
-          className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${
-            role === 'PARENT' ? 'text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
-          }`}
-          style={role === 'PARENT' ? { backgroundColor: '#4FB6E1' } : {}}
-        >
-          PARENT
-        </button>
-        <button
-          onClick={() => { setRole('DOCTOR'); setActiveTab('home'); }}
-          className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${
-            role === 'DOCTOR' ? 'text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
-          }`}
-          style={role === 'DOCTOR' ? { backgroundColor: '#FF8B64' } : {}}
-        >
-          DOCTOR
-        </button>
-        <button
-          onClick={() => { setRole('ADMIN'); setActiveTab('home'); }}
-          className={`px-4 py-1.5 rounded-full text-[10px] font-bold transition-all ${
-            role === 'ADMIN' ? 'text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
-          }`}
-          style={role === 'ADMIN' ? { backgroundColor: '#76D191' } : {}}
-        >
-          ADMIN
-        </button>
-      </div>
+
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header - Fixed Height */}
-        <header className="px-6 pt-14 pb-8 rounded-b-[45px] shadow-lg relative overflow-hidden flex-shrink-0" style={{ backgroundColor: role === 'DOCTOR' ? '#FF8B64' : role === 'ADMIN' ? '#76D191' : '#4FB6E1' }}>
+        <header className="header-safe px-6 pb-8 rounded-b-[45px] shadow-lg relative overflow-hidden flex-shrink-0" style={{ backgroundColor: role === 'DOCTOR' ? '#FF8B64' : role === 'ADMIN' ? '#76D191' : '#4FB6E1' }}>
           <div className="absolute top-[-30px] right-[-30px] w-48 h-48 bg-white/10 rounded-full" />
           <div className="relative z-10 flex justify-between items-center text-white">
             <div className="flex items-center gap-3">
@@ -387,7 +352,7 @@ export default function App() {
         </header>
 
         {/* Dynamic Main Body */}
-        <main className="flex-1 overflow-y-auto bg-[#F8FAFC] pb-24 scrollbar-hide">
+        <main className="flex-1 overflow-y-auto bg-[#F8FAFC] pb-4 scrollbar-hide">
           <AnimatePresence mode="wait">
             {role === 'PARENT' && (
               <ParentView 
@@ -448,7 +413,7 @@ export default function App() {
         </main>
 
         {/* Unified Bottom Nav */}
-        <nav className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-50 px-8 py-4 flex justify-between items-center rounded-t-[45px] shadow-[0_-15px_40px_rgba(0,0,0,0.04)] z-30 h-24">
+        <nav className="nav-safe flex-shrink-0 bg-white border-t border-slate-50 px-8 pt-4 flex justify-between items-center rounded-t-[45px] shadow-[0_-15px_40px_rgba(0,0,0,0.04)] z-30">
           <NavItems role={role} activeTab={activeTab} setActiveTab={setActiveTab} themeColor={role === 'DOCTOR' ? '#FF8B64' : role === 'ADMIN' ? '#76D191' : '#4FB6E1'} />
         </nav>
       </div>
@@ -546,7 +511,7 @@ function LoginView({
   };
 
   return (
-    <div className="p-8 flex flex-col items-center justify-center text-center h-full bg-white space-y-8 relative overflow-hidden">
+    <div className="p-8 flex flex-col items-center justify-center text-center flex-1 bg-white space-y-8 relative overflow-hidden overflow-y-auto scrollbar-hide">
       {/* Animated background glow */}
       <motion.div 
         animate={{ backgroundColor: theme.color }}
@@ -735,7 +700,7 @@ function RegisterView({ onRegister, onBack }: { onRegister: (name: string, email
   };
 
   return (
-    <div className="p-8 flex flex-col items-center justify-center bg-white h-full space-y-6 relative overflow-hidden">
+    <div className="p-8 flex flex-col items-center justify-center bg-white flex-1 space-y-6 relative overflow-hidden overflow-y-auto scrollbar-hide">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-accent" />
       
       <div className="w-full text-left space-y-2">
