@@ -3,10 +3,22 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
+// Plugin to strip `crossorigin` attributes from the built HTML.
+// Android WebView (WebViewAssetLoader) fails CORS checks for ES module scripts
+// loaded via the appassets:// scheme, causing a blank white screen.
+function stripCrossOrigin() {
+  return {
+    name: 'strip-crossorigin',
+    transformIndexHtml(html: string) {
+      return html.replace(/ crossorigin(="[^"]*")?/g, '');
+    },
+  };
+}
+
 export default defineConfig(() => {
   return {
     base: './',
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), stripCrossOrigin()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
